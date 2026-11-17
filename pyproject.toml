@@ -8,7 +8,12 @@ version = "0.1.0"
 description = "AppleCrumble is a simple SSG that converts your markdown into HTML for the browser."
 readme = "README.md"
 requires-python = ">=3.9"
+dependencies = [
+    'click>=8.5.1',
+    'PyYAML>=6.0.3',
+]
 
 [project.scripts]
-AppleCrumble init = "AppleCrumble.main:init"
-AppleCrumble build = "AppleCrumble.main:build"
+AppleCrumble-init = "AppleCrumble.main:init"
+AppleCrumble-build = "AppleCrumble.main:build"
+AppleCrumble-create_new_page = "AppleCrumble.main:make_page"
