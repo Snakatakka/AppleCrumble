@@ -40,8 +40,6 @@ def build(m : str):
         readable_yaml = yaml.load(yaml_file, yaml.FullLoader)
         style = readable_yaml['style']
         title = readable_yaml['title']
-
-        open(f"_site/static/{style}", "w")
         
         with open(f"_content/{m}/{m}.md") as md_file:
             if not (os.path.exists(f"_site/{m}")):
