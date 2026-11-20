@@ -61,6 +61,20 @@ def build(m : str):
                 for line in md_file:
                     if line.startswith("<") or line.strip("\n").endswith(">"):
                         html_file.write(line) # Skips the whole shebang if the line is already in html
+                    # elif line.__contains__("]("):
+                    #     split_link = line.split("](")
+                    #     super_split_link = split_link[1].split()
+                    #     text = split_link[0].strip("!").strip("[")
+                    #     link = super_split_link[0].strip("(") # We're not worried about the title right now
+                    #     title = ""
+
+                    #     if len(super_split_link) == 2:
+                    #         title = super_split_link[1]
+
+                    #     if line.startswith("!["):
+                    #         html_file.write(f"<img src=\"{link}\" alt=\"{text}\" title=\"{title}\">")
+                    #     else:
+                    #         html_file
                     else:
                         tag = parse_tag(line)
                         contents = parse_contents(line, tag)
@@ -124,7 +138,27 @@ def convert_contents_to_html(contents : str):
     for i in range(len(words)): # This is so fucked dude
         words[i] = get_bold_and_italic(words[i])
         words[i] = get_code_block(words[i])
-    
+
+        if words[i].__contains__("]("):
+            print("started image!")
+            split_link = words[i].split("](")
+            super_split_link = split_link[1].split()
+            text = split_link[0].strip("!").strip("[")
+            link = super_split_link[0].strip(")") # We're not worried about the title right now
+            title = ""
+
+            if len(super_split_link) == 2:
+                title = super_split_link[1]
+
+            if words[i].startswith("!["):
+                words[i] = f"<img src=\"{link}\" alt=\"{text}\" title=\"{title}\">"
+            else:
+                words[i] = f"<a href=\"{link}\">{text}</a>"
+        
+    for string in words:
+        if string.startswith("![") or string.startswith("["):
+            words.remove(string)
+
     contents = " ".join(words)
     return contents
 
