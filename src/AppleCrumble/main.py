@@ -45,7 +45,7 @@ def build(m : str):
             if not (os.path.exists(f"_site/{m}")):
                 os.mkdir(f"_site/{m}")
 
-            with open(f"_site/{m}.html", "w") as html_file:
+            with open(f"_site/{m}/{m}.html", "w") as html_file:
                 html_file.write("<!DOCTYPE html>\n")
                 html_file.write("<html>\n")
                 
