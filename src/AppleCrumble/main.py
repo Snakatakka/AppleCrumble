@@ -1,6 +1,7 @@
 import click
 import yaml
 import os
+import re
 
 def init():
    os.mkdir("_content")
@@ -61,20 +62,6 @@ def build(m : str):
                 for line in md_file:
                     if line.startswith("<") or line.strip("\n").endswith(">"):
                         html_file.write(line) # Skips the whole shebang if the line is already in html
-                    # elif line.__contains__("]("):
-                    #     split_link = line.split("](")
-                    #     super_split_link = split_link[1].split()
-                    #     text = split_link[0].strip("!").strip("[")
-                    #     link = super_split_link[0].strip("(") # We're not worried about the title right now
-                    #     title = ""
-
-                    #     if len(super_split_link) == 2:
-                    #         title = super_split_link[1]
-
-                    #     if line.startswith("!["):
-                    #         html_file.write(f"<img src=\"{link}\" alt=\"{text}\" title=\"{title}\">")
-                    #     else:
-                    #         html_file
                     else:
                         tag = parse_tag(line)
                         contents = parse_contents(line, tag)
@@ -134,32 +121,42 @@ def convert_lines_to_html(contents : str, tag : str):
 
 def convert_contents_to_html(contents : str): 
     words = contents.split()
+    new_words = []
+    should_continue = False
     
-    for i in range(len(words)): # This is so fucked dude
+    for i in range(len(words)): # This is so fucked dude    
+        if should_continue:
+            if words[i].endswith(")"):
+                should_continue = False
+            continue
+        
         words[i] = get_bold_and_italic(words[i])
         words[i] = get_code_block(words[i])
 
-        if words[i].__contains__("]("):
-            print("started image!")
-            split_link = words[i].split("](")
-            super_split_link = split_link[1].split()
-            text = split_link[0].strip("!").strip("[")
-            link = super_split_link[0].strip(")") # We're not worried about the title right now
-            title = ""
+        if words[i].startswith("["):
+            text = extract_substring("[", "]", contents)
+            link = extract_substring("(", ")", contents)
+            words[i] = f"<a href={link}>{text}</a>"
+            should_continue = True
+            
 
-            if len(super_split_link) == 2:
-                title = super_split_link[1]
+        if words[i].startswith("!["):
+            text = extract_substring("![", "]", contents)
+            link = extract_substring("(", ")", contents)
+            title = extract_substring("\"", "\"", link)
+            link = link.replace("\"" + title + "\"", "")
 
-            if words[i].startswith("!["):
-                words[i] = f"<img src=\"{link}\" alt=\"{text}\" title=\"{title}\">"
-            else:
-                words[i] = f"<a href=\"{link}\">{text}</a>"
-        
-    for string in words:
-        if string.startswith("![") or string.startswith("["):
-            words.remove(string)
+            if words[i].__contains__(" \"") and words[i].__contains__("\")"):
+                link = extract_substring("(", "\\s", contents)
+                title = extract_substring("\"", "\")"), contents
 
-    contents = " ".join(words)
+            formatted = f"![{text}]({link} \"{title}\")"
+            words[i] = f"<img src={link} alt=\"{text}\" title=\"{title}\">"
+            should_continue = True
+
+        new_words.append(words[i])
+    
+    contents = " ".join(new_words)
     return contents
 
 def find_and_replace(word:str, targets:list, html_replacement:str):
@@ -183,3 +180,10 @@ def get_bold_and_italic(word : str):
         word = find_and_replace(word, ["*", "_"], "em")
 
     return word
+
+def extract_substring(start : str, end : str, text : str):
+    a = text.find(start)
+    b = text.find(end, (a + len(start)))
+
+    if (a != -1) and (b != -1):
+        return text[a + len(start):b]
