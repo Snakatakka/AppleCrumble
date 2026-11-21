@@ -2,12 +2,16 @@ import click
 import yaml
 import os
 import re
+import time
 
 def init():
+   start = time.time()
    os.mkdir("_content")
    os.makedirs("_site/static")
    create_new_page("index")
    open("_site/static/styles.css", "w")
+   end = time.time()
+   click.echo(f"🍏 - Project initialized in {round(end - start, 3)} seconds")
 
 def create_new_page(page_name:str):
     if not (os.path.exists(f"_content/{page_name}")):
@@ -24,11 +28,15 @@ def create_new_page(page_name:str):
 @click.command()
 @click.option('--p', default=None, help='The name of the page that you want to make.')
 def make_page(p : str):
+    start = time.time()
     if p == None:
-        click.echo("Page name not specified, please specify the name of the page that you want to make.")
+        click.echo("🍏 - Page name not specified, please specify the name of the page that you want to make.")
         return
     else:
         create_new_page(p)
+        end = time.time()
+        click.echo(f"🍏 - Created new page {p} in {round(end - start, 3)} seconds")
+        
     
 @click.command()
 @click.option('--m', default=None, help='The markdown file that you want to compile into HTML.')
@@ -36,7 +44,8 @@ def build(m : str):
     if m == None:
         click.echo("No folder specified, please specify a folder.")
         return
-
+    
+    start = time.time()
     with open(f"_content/{m}/{m}.yaml") as yaml_file:
         readable_yaml = yaml.load(yaml_file, yaml.FullLoader)
         style = readable_yaml['style']
@@ -73,6 +82,8 @@ def build(m : str):
                 html_file.write("</body>\n")
                 html_file.write("\n")
                 html_file.write("</html>")
+        end = time.time()
+        click.echo(f"🍏 - Compiled {m} into HTML in {round(end - start, 3)} seconds")
 
 # Adding the functions from parser and converter here because i can't figure out how to add them as a dependency
 
