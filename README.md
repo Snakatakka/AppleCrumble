@@ -48,7 +48,3 @@ As of version 0.1.0, AppleCrumble is very simplistic, only being able to convert
 ## AI Disclosure
 
 Absolutely zero AI was used throughout the process of making this project.
-
-## Reviewer Notes
-
-If you're reading this far, you're probably a reviewer for Phantom. I don't really have anything to say except that the PyPi link that I submitted in Phantom is outdated, and I've made updates to it since then, so make sure to use the latest one. 
