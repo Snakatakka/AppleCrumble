@@ -42,7 +42,7 @@ def make_page(p : str):
 @click.option('--m', default=None, help='The markdown file that you want to compile into HTML.')
 def build(m : str):
     if m == None:
-        click.echo("No folder specified, please specify a folder.")
+        click.echo("🍏 - No folder specified, please specify a folder.")
         return
     
     start = time.time()
@@ -134,13 +134,15 @@ def convert_contents_to_html(contents : str):
     words = contents.split()
     new_words = []
     should_continue = False
+    image_instance = 0
+    link_instance = 0
     
     for i in range(len(words)): # This is so fucked dude    
         if should_continue:
             if words[i].endswith(")"):
                 should_continue = False
             continue
-        
+
         words[i] = get_bold_and_italic(words[i])
         words[i] = get_code_block(words[i])
 
@@ -161,7 +163,6 @@ def convert_contents_to_html(contents : str):
                 link = extract_substring("(", "\\s", contents)
                 title = extract_substring("\"", "\")"), contents
 
-            formatted = f"![{text}]({link} \"{title}\")"
             words[i] = f"<img src={link} alt=\"{text}\" title=\"{title}\">"
             should_continue = True
 
@@ -172,9 +173,13 @@ def convert_contents_to_html(contents : str):
 
 def find_and_replace(word:str, targets:list, html_replacement:str):
     for target in targets:
+        if word.startswith(target) and word.endswith(target):
+            word = f"<{html_replacement}>" + word.removeprefix(target).removesuffix(target) + f"</{html_replacement}>"
+
         if word.startswith(target):
             word = f"<{html_replacement}>" + word.removeprefix(target)
-        elif word.endswith(target):
+        
+        if word.endswith(target):
             word = word.removesuffix(target) + f"</{html_replacement}>"
     return word
 
@@ -184,12 +189,12 @@ def get_code_block(word : str):
 def get_bold_and_italic(word : str):
     if word.startswith("***") or word.startswith("___"):
         word = "<strong><em>" + word.removeprefix("***").removeprefix("___")
-    elif word.endswith("***") or word.endswith("___"):
+    
+    if word.endswith("***") or word.endswith("___"):
         word = word.removesuffix("***").removesuffix("___") + "</em></strong>"
-    else:
-        word = find_and_replace(word, ["**", "__"], "strong")
-        word = find_and_replace(word, ["*", "_"], "em")
-
+    
+    word = find_and_replace(word, ["**", "__"], "strong")
+    word = find_and_replace(word, ["*", "_"], "em")
     return word
 
 def extract_substring(start : str, end : str, text : str):
