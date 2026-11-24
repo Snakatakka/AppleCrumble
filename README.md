@@ -3,6 +3,8 @@
 
 AppleCrumble is a stupid-simple command-line based SSG (static-site generator) that takes your markdown (.md) files and YAML files and turns them into HTML files able to be read by the browser.
 
+![AppleCrumble Screenshot](https://cdn.hackclub.com/01a1fc6c-d99d-7bbe-aeb6-6966d0ef792a/AppleCrumblescreenshot.png)
+
 ## Installation
 
 To install AppleCrumble, make sure you have pip installed. Then run:
